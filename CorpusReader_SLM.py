@@ -126,14 +126,14 @@ class CorpusReader_SLM:
         if code not in [0,1,2]:
             return []
         
-        sentance = list(head)
+        sentence = list(head)
 
         if code == 0: #always pick max prob
             max_prob = max(self.unigram_probs.values())
             # grab every word tied for max_prob, then randomly pick one
             best_words = [w for w, p in self.unigram_probs.items() if p == max_prob]
-            word = random.choice(best_words)
-            sentance.append(word)
+            word = random.choices(best_words)
+            sentence.append(word)
             
         elif code == 1:  # weighted random choice
             words, probs = zip(*self.unigram_probs.items())
@@ -146,14 +146,22 @@ class CorpusReader_SLM:
             items = sorted(self.unigram_probs.items(),key=lambda x:-x[1])[:10]
             words, probs = zip(*items)
             # pick 1 word from this top-10 group using their normalized probs
-            word = random.choice(words, weights=probs, k=1)[0]
-            sentance.append(word)   
+            word = random.choices(words, weights=probs, k=1)[0]
+            sentence.append(word)   
         
-        return self._format_sentance(sentance)
+        return self._format_sentence(sentence)
 
     def bigramGenerate(self, code=0, head=[]):
         return ""
 
     def trigramGenerate(self, code=0, head=[]):
         return ""
-
+    
+        # helper to format sentences properly
+    def _format_sentence(self, tokens):
+        result = ""
+        for i, w in enumerate(tokens):
+            if i > 0 and w not in [".", ",", "!", "?", ";", ":"]:
+                result += " "
+            result += w
+        return result
