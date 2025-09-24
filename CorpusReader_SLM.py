@@ -78,8 +78,9 @@ class CorpusReader_SLM:
         ugrams = list(zip(words, prob))
 
         if count > 0:
-            ugrams.sort(key=lambda x:x[1], reverse=True)[:count]
-            return ugrams.sort(key=lambda x:x[0])
+            ugrams.sort(key=lambda x:x[1], reverse=True)[:count] # sort on probability count
+            ugrams.sort(key=lambda x:x[0]) # then sort on alphabet
+            return ugrams
 
         # sorted() creates a copy of original list while sort() does not
         ugrams.sort()
@@ -87,15 +88,40 @@ class CorpusReader_SLM:
         return ugrams
 
     def bigram(self, count = 0):
-        #return list of tuples
-        #each tuple in form (bigram, probability)
-        #if count > 0, only contains highest prob bigrams
-        #
+        words = list(self.bigram_probs.keys())
+        prob = list(self.bigram_probs.values())
 
-        return []
+        bigrams = list(zip(words, prob))
+
+        if count > 0:
+            bigrams.sort(key=lambda x:x[1], reverse=True)[:count]
+            bigrams.sort(key=lambda x:x[0])
+            return bigrams
+
+        bigrams.sort()
+
+        return bigrams
 
     def trigram(self, count = 0):
-        return []
+        # return an empty list if trigram set to false
+        if self.trigram == False:
+            return []
+
+        words = list(self.trigram_probs.keys())
+        prob = list(self.trigram_probs.values())
+
+        trigrams = list(zip(words, prob))
+
+        if count > 0:
+            trigrams.sort(key=lambda x:x[1], reverse=True)[:count]
+            trigrams.sort(key=lambda x:x[0])
+            return trigrams
+
+        trigrams.sort()
+
+        return trigrams
+
+    # important --- haven't accounted for if there are ties for probabilities
 
     def unigramGenerate(self, code=0, head=[]):
         return ""
