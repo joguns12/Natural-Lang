@@ -77,15 +77,12 @@ class CorpusReader_SLM:
 
         ugrams = list(zip(words, prob))
 
+        # must account for ties
         if count > 0:
             ugrams.sort(key=lambda x:x[1], reverse=True) # sort on probability count
             if count <= len(ugrams):
                 cutoff = ugrams[count - 1][1]
-            else:
-                cutoff = 0
-            ugrams[:] = filter(lambda x:x[1] >= cutoff, ugrams)
-            ugrams.sort()
-            return ugrams
+                ugrams[:] = list(filter(lambda x:x[1] >= cutoff, ugrams))
 
         # sorted() creates a copy of original list while sort() does not
         ugrams.sort()
@@ -98,12 +95,12 @@ class CorpusReader_SLM:
         bigrams = list(zip(words, prob))
 
         if count > 0:
-            bigrams.sort(key=lambda x:x[1], reverse=True)[:count]
-            bigrams.sort()
-            return bigrams
+            bigrams.sort(key=lambda x:x[1], reverse=True)
+            if count <= len(bigrams):
+                cutoff = bigrams[count - 1][1]
+                bigrams[:] = list(filter(lambda x:x[1] >= cutoff, bigrams))
 
         bigrams.sort()
-
         return bigrams
 
     def trigram(self, count = 0):
@@ -117,15 +114,13 @@ class CorpusReader_SLM:
         trigrams = list(zip(words, prob))
 
         if count > 0:
-            trigrams.sort(key=lambda x:x[1], reverse=True)[:count]
-            trigrams.sort()
-            return trigrams
+            trigrams.sort(key=lambda x:x[1], reverse=True)
+            if count <= len(trigrams):
+                cutoff = trigrams[count - 1][1]
+                trigrams[:] = list(filter(lambda x:x[1] >= cutoff, trigrams))
 
         trigrams.sort()
-
         return trigrams
-
-    # important --- haven't accounted for if there are ties for probabilities
 
     def unigramGenerate(self, code=0, head=[]):
         return ""
