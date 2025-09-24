@@ -78,13 +78,17 @@ class CorpusReader_SLM:
         ugrams = list(zip(words, prob))
 
         if count > 0:
-            ugrams.sort(key=lambda x:x[1], reverse=True)[:count] # sort on probability count
-            ugrams.sort(key=lambda x:x[0]) # then sort on alphabet
+            ugrams.sort(key=lambda x:x[1], reverse=True) # sort on probability count
+            if count <= len(ugrams):
+                cutoff = ugrams[count - 1][1]
+            else:
+                cutoff = 0
+            ugrams[:] = filter(lambda x:x[1] >= cutoff, ugrams)
+            ugrams.sort()
             return ugrams
 
         # sorted() creates a copy of original list while sort() does not
         ugrams.sort()
-
         return ugrams
 
     def bigram(self, count = 0):
@@ -95,7 +99,7 @@ class CorpusReader_SLM:
 
         if count > 0:
             bigrams.sort(key=lambda x:x[1], reverse=True)[:count]
-            bigrams.sort(key=lambda x:x[0])
+            bigrams.sort()
             return bigrams
 
         bigrams.sort()
@@ -114,7 +118,7 @@ class CorpusReader_SLM:
 
         if count > 0:
             trigrams.sort(key=lambda x:x[1], reverse=True)[:count]
-            trigrams.sort(key=lambda x:x[0])
+            trigrams.sort()
             return trigrams
 
         trigrams.sort()
