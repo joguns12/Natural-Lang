@@ -149,7 +149,7 @@ class CorpusReader_SLM:
             word = random.choice(words, weights=probs, k=1)[0]
             sentance.append(word)   
         
-        return self.__format__sentance(sentance)
+        return self._format_sentance(sentance)
 
     def bigramGenerate(self, code=0, head=[]):
         return ""
