@@ -123,7 +123,33 @@ class CorpusReader_SLM:
         return trigrams
 
     def unigramGenerate(self, code=0, head=[]):
-        return ""
+        if code not in [0,1,2]:
+            return []
+        
+        sentance = list(head)
+
+        if code == 0: #always pick max prob
+            max_prob = max(self.unigram_probs.values())
+            # grab every word tied for max_prob, then randomly pick one
+            best_words = [w for w, p in self.unigram_probs.items() if p == max_prob]
+            word = random.choice(best_words)
+            sentance.append(word)
+            
+        elif code == 1:  # weighted random choice
+            words, probs = zip(*self.unigram_probs.items())
+            # random.choices(..., k=1) picks *1 word* using probs as weights
+            # if k was 2, it would pick 2 words, etc.
+            word = random.choices(words, weights=probs, k=1)[0]
+            sentence.append(word)
+
+        elif code == 2:  # uniform random choice
+            items = sorted(self.unigram_probs.items(),key=lambda x:-x[1])[:10]
+            words, probs = zip(*items)
+            # pick 1 word from this top-10 group using their normalized probs
+            word = random.choice(words, weights=probs, k=1)[0]
+            sentance.append(word)   
+        
+        return self.__format__sentance(sentance)
 
     def bigramGenerate(self, code=0, head=[]):
         return ""
