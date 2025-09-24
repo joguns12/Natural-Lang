@@ -1,12 +1,9 @@
-''' 
-Add modules you want to import first
-
-'''
 import random
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from collections import Counter, defaultdict
+
 class CorpusReader_SLM:
     def __init__(self, corpus, stopWord='none', toStem=False, smooth=False, trigram=False):
         self.smooth = smooth
@@ -75,7 +72,19 @@ class CorpusReader_SLM:
                                       if self.bigram_counts.get((w1, w2), 0) > 0}
                 
     def unigram(self, count = 0):
-        return []
+        words = list(self.unigram_probs.keys())
+        prob = list(self.unigram_probs.values())
+
+        ugrams = list(zip(words, prob))
+
+        if count > 0:
+            ugrams.sort(key=lambda x:x[1], reverse=True)
+            return ugrams[:count]
+        
+        # sorted() creates a copy of original list while sort() does not
+        ugrams.sort()
+
+        return ugrams
 
     def bigram(self, count = 0):
         return []
