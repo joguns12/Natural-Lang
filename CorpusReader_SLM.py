@@ -123,33 +123,34 @@ class CorpusReader_SLM:
         return trigrams
 
     def unigramGenerate(self, code=0, head=[]):
-        if code not in [0,1,2]:
+        if code not in [0, 1, 2]:
             return ""
-        
+
         sentence = list(head)
 
-        if code == 0: #always pick max prob
-            max_prob = max(self.unigram_probs.values())
+        # generate 10 words by default (fixed length)
+        for _ in range(10):
+            if code == 0: 
             # grab every word tied for max_prob, then randomly pick one
-            best_words = [w for w, p in self.unigram_probs.items() if p == max_prob]
-            word = random.choices(best_words)
-            sentence.append(word)
-            
-        elif code == 1:  # weighted random choice
-            words, probs = zip(*self.unigram_probs.items())
+                max_prob = max(self.unigram_probs.values())
+                best_words = [w for w, p in self.unigram_probs.items() if p == max_prob]
+                word = random.choice(best_words)
+
+            elif code == 1:  # weighted random
             # random.choices(..., k=1) picks *1 word* using probs as weights
             # if k was 2, it would pick 2 words, etc.
-            word = random.choices(words, weights=probs, k=1)[0]
+                words, probs = zip(*self.unigram_probs.items())
+                word = random.choices(words, weights=probs, k=1)[0]
+
+            elif code == 2:  # top-10 weighted random
+                items = sorted(self.unigram_probs.items(), key=lambda x: -x[1])[:10]
+                words, probs = zip(*items)
+                word = random.choices(words, weights=probs, k=1)[0]
+
             sentence.append(word)
 
-        elif code == 2:  # uniform random choice
-            items = sorted(self.unigram_probs.items(), key=lambda x:-x[1])[:10]
-            # pick 1 word from this top-10 group using their normalized probs
-            words, probs = zip(*items)
-            word = random.choices(words, weights=probs, k=1)[0]
-            sentence.append(word)   
-        
         return self._format_sentence(sentence)
+
 
     def bigramGenerate(self, code=0, head=[]):
         return ""
