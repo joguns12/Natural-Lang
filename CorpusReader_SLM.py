@@ -5,7 +5,7 @@ from nltk.stem import SnowballStemmer
 from collections import Counter, defaultdict
 
 class CorpusReader_SLM:
-    def __init__(self, corpus, stopWord='none', toStem=False, smooth=False, trigram=False):
+    def __init__(self, corpus, stopWord='none', toStem=False, smooth=False, trigram=True):
         self.smooth = smooth
         self.use_trigram = trigram
 
@@ -177,34 +177,31 @@ class CorpusReader_SLM:
 
         return self._format_sentence(sentence)
 
-    def trigramGenerate(self, code=0, head=[]):
+    def trigramGenerate(self, code=0, head=[], length=10):
         if code not in [0, 1, 2] or self.trigram == False:
             return ""
 
         sentence = list(head)
-
-        for _ in range(10):
-            if len(sentence) < 2:
-                break
-            
+        
+        for _ in range(length):
             context = tuple(sentence[-2:])
-            candidates = [(w, p) for (c, w), p in self.trigram_probs.items() if c == context]
-            if not candidates:
+            candidates = {k: v for k, v in self.trigram_probs.items() if k[:2] == context} 
+            if not candidates: 
                 break
 
             if code == 0: 
                 max_prob = max(self.trigram_probs.values())
                 best_words = [w for w, p in self.trigram_probs.items() if p == max_prob]
-                word = random.choice(best_words)
+                word = random.choice(best_words)[2]
 
             elif code == 1:  # weighted random
                 words, probs = zip(*self.trigram_probs.items())
-                word = random.choices(words, weights=probs, k=1)[0]
+                word = random.choices(words, weights=probs, k=1)[0][2]
 
             elif code == 2:  # top-10 weighted random
                 items = sorted(self.trigram_probs.items(), key=lambda x: -x[1])[:10]
                 words, probs = zip(*items)
-                word = random.choices(words, weights=probs, k=1)[0]
+                word = random.choices(words, weights=probs, k=1)[0][2]
 
             sentence.append(word)
 
