@@ -124,7 +124,7 @@ class CorpusReader_SLM:
 
     def unigramGenerate(self, code=0, head=[]):
         if code not in [0,1,2]:
-            return []
+            return ""
         
         sentence = list(head)
 
@@ -143,9 +143,9 @@ class CorpusReader_SLM:
             sentence.append(word)
 
         elif code == 2:  # uniform random choice
-            items = sorted(self.unigram_probs.items(),key=lambda x:-x[1])[:10]
-            words, probs = zip(*items)
+            items = sorted(self.unigram_probs.items(), key=lambda x:-x[1])[:10]
             # pick 1 word from this top-10 group using their normalized probs
+            words, probs = zip(*items)
             word = random.choices(words, weights=probs, k=1)[0]
             sentence.append(word)   
         
