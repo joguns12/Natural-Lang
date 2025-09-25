@@ -153,10 +153,62 @@ class CorpusReader_SLM:
 
 
     def bigramGenerate(self, code=0, head=[]):
-        return ""
+        if code not in [0, 1, 2]:
+            return ""
+
+        sentence = list(head)
+
+        for _ in range(10):
+            if code == 0: 
+                max_prob = max(self.bigram_probs.values())
+                best_words = [w for w, p in self.bigram_probs.items() if p == max_prob]
+                word = random.choice(best_words)
+
+            elif code == 1:  # weighted random
+                words, probs = zip(*self.bigram_probs.items())
+                word = random.choices(words, weights=probs, k=1)[0]
+
+            elif code == 2:  # top-10 weighted random
+                items = sorted(self.bigram_probs.items(), key=lambda x: -x[1])[:10]
+                words, probs = zip(*items)
+                word = random.choices(words, weights=probs, k=1)[0]
+
+            sentence.append(word[1])
+
+        return self._format_sentence(sentence)
 
     def trigramGenerate(self, code=0, head=[]):
-        return ""
+        if code not in [0, 1, 2] or self.trigram == False:
+            return ""
+
+        sentence = list(head)
+
+        for _ in range(10):
+            if len(sentence) < 2:
+                break
+            
+            context = tuple(sentence[-2:])
+            candidates = [(w, p) for (c, w), p in self.trigram_probs.items() if c == context]
+            if not candidates:
+                break
+
+            if code == 0: 
+                max_prob = max(self.trigram_probs.values())
+                best_words = [w for w, p in self.trigram_probs.items() if p == max_prob]
+                word = random.choice(best_words)
+
+            elif code == 1:  # weighted random
+                words, probs = zip(*self.trigram_probs.items())
+                word = random.choices(words, weights=probs, k=1)[0]
+
+            elif code == 2:  # top-10 weighted random
+                items = sorted(self.trigram_probs.items(), key=lambda x: -x[1])[:10]
+                words, probs = zip(*items)
+                word = random.choices(words, weights=probs, k=1)[0]
+
+            sentence.append(word)
+
+        return self._format_sentence(sentence)
     
         # helper to format sentences properly
     def _format_sentence(self, tokens):
